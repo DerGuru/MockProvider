@@ -11,8 +11,8 @@ public class MockProvider : IList<ServiceDescriptor>, IServiceProvider, IService
 
     public MockProvider()
     {
-        this.Add(new ServiceDescriptor(typeof(IServiceProvider), this));
-        this.Add(new ServiceDescriptor(typeof(IServiceCollection), this));
+        _mocks.Add(new InstanceDescriptor(typeof(IServiceProvider), this));
+        _mocks.Add(new InstanceDescriptor(typeof(IServiceCollection), this));
     }
     public MockProvider(IEnumerable<Mock> mocks) : this()
     {
@@ -26,7 +26,7 @@ public class MockProvider : IList<ServiceDescriptor>, IServiceProvider, IService
     public MockProvider(params Mock[] mocks) : this(mocks.AsEnumerable()) { }
 
     #region IServiceProvider
-    public object GetService(Type serviceType) => CreateMock(serviceType).Object;
+    public object GetService(Type serviceType) => CreateMock(serviceType).Instance;
     #endregion
 
     public void Add<T>(Mock<T> mock) where T : class
@@ -34,31 +34,32 @@ public class MockProvider : IList<ServiceDescriptor>, IServiceProvider, IService
         Add(typeof(T), mock);
     }
 
-    public void Add(Type t, Mock mock)
+    public MockDescriptor Add(Type t, Mock mock)
     {
-        var e = this.FirstOrDefault(x => x.ServiceType.FullName == t.FullName);
-        if (e != null)
+        var e = _mocks.FirstOrDefault(x => x.ServiceType.FullName == t.FullName);
+        if (e == null)
         {
-            Remove(e);
+            e = new MockDescriptor(t, mock, this);
+            _mocks.Add(e);
         }
-        _mocks.Add(new MockDescriptor(t, mock, this));
+        return e;
     }
 
     public Mock<U> CreateMock<U>(params object[] o) where U : class
     {
-        return CreateMock(typeof(U), o) as Mock<U>;
+        return CreateMock(typeof(U), o).Mock as Mock<U>;
     }
 
     public Mock<U> CreateMock<U>() where U : class
     {
-        return CreateMock(typeof(U)) as Mock<U>;
+        return CreateMock(typeof(U)).Mock as Mock<U>;
     }
 
-    public Mock CreateMock(Type serviceType) => CreateMock(serviceType, GetConstructorParameters(serviceType));
+    public MockDescriptor CreateMock(Type serviceType) => CreateMock(serviceType, GetConstructorParameters(serviceType));
     
-    public Mock CreateMock(Type serviceType, params object[] o) => CreateMock(serviceType, o.AsEnumerable());
+    public MockDescriptor CreateMock(Type serviceType, params object[] o) => CreateMock(serviceType, o.AsEnumerable());
     
-    public Mock CreateMock(Type serviceType, IEnumerable<object> o)
+    public MockDescriptor CreateMock(Type serviceType, IEnumerable<object> o)
     {
         var retVal = _mocks.FirstOrDefault(x => x.ServiceType.FullName == serviceType.FullName);
         if (retVal == null || !retVal.IsCreated)
@@ -67,11 +68,10 @@ public class MockProvider : IList<ServiceDescriptor>, IServiceProvider, IService
 
             mockType = mockType.MakeGenericType(serviceType);
             Mock m = Activator.CreateInstance(mockType, o) as Mock;
-            Add(serviceType, m);
-            return m;
+            return Add(serviceType, m);
         }
         else
-            return retVal.Mock;
+            return retVal;
     }
 
     private object[] GetConstructorParameters(Type t)
