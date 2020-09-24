@@ -58,7 +58,7 @@ public class MockDescriptor : ServiceDescriptor
 
     public virtual bool IsCreated { get; private set; } = false;
      
-    public void Verify()
+    public virtual void Verify()
     {
         if (IsCreated)
             _mock.Verify();
@@ -78,5 +78,6 @@ public class InstanceDescriptor : MockDescriptor
     public override object Instance { get; }
     public override bool IsCreated => true;
     public override Mock Mock => null;
+    public override void Verify() { }
 }
 

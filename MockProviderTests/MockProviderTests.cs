@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
 
 namespace MockProviderTests
 {
@@ -14,6 +15,7 @@ namespace MockProviderTests
             m.AddTransient<Foo>();
             m.AddTransient(typeof(Bar<>));
             var o = m.GetRequiredService<Foo>();
+            m.Verify();
         }
 
         [TestMethod]
@@ -24,6 +26,7 @@ namespace MockProviderTests
             var m = new MockProvider(m1, m2);
 
             var o = m.GetRequiredService<IServiceScope>();
+            m.Verify();
         }
 
 
@@ -35,6 +38,8 @@ namespace MockProviderTests
 
     public class Bar<T>
     {
-
+        public Bar(IServiceProvider sp)
+        { 
+        }
     }
 }
