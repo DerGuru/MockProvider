@@ -44,6 +44,4 @@ public static class StartupTest
             }
         }
     }
-
-   
 }
