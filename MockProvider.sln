@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30517.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockProvider", "MockProvider\MockProvider.csproj", "{6435FF14-5DD8-4992-A662-B4BF03E26C9F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockProvider", "MockProvider\MockProvider.csproj", "{6435FF14-5DD8-4992-A662-B4BF03E26C9F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockProviderTests", "MockProviderTests\MockProviderTests.csproj", "{123FA7D4-92B9-437E-81ED-AD3ADC48A0FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockProviderTests", "MockProviderTests\MockProviderTests.csproj", "{123FA7D4-92B9-437E-81ED-AD3ADC48A0FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StartUpTests", "StartUpTests\StartUpTests.csproj", "{F10DAE0E-1125-4738-99F7-9585715BF52C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{123FA7D4-92B9-437E-81ED-AD3ADC48A0FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{123FA7D4-92B9-437E-81ED-AD3ADC48A0FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{123FA7D4-92B9-437E-81ED-AD3ADC48A0FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F10DAE0E-1125-4738-99F7-9585715BF52C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F10DAE0E-1125-4738-99F7-9585715BF52C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F10DAE0E-1125-4738-99F7-9585715BF52C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F10DAE0E-1125-4738-99F7-9585715BF52C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -112,7 +112,7 @@ public class MockProvider : IList<ServiceDescriptor>, IServiceProvider, IService
         set => _mocks[index] = value as MockDescriptor ?? new MockDescriptor(value.ServiceType, this);
     }
 
-    void Add(ServiceDescriptor item)
+    public void Add(ServiceDescriptor item)
     {
         _mocks.Add(item as MockDescriptor ?? new MockDescriptor(item.ServiceType, this));
     }
@@ -131,11 +131,6 @@ public class MockProvider : IList<ServiceDescriptor>, IServiceProvider, IService
     public void RemoveAt(int index)
     {
         _mocks.RemoveAt(index);
-    }
-
-    void ICollection<ServiceDescriptor>.Add(ServiceDescriptor item)
-    {
-        Add(item);
     }
 
     public void Clear()
