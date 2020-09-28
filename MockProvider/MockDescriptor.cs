@@ -43,29 +43,11 @@ public class MockDescriptor : ServiceDescriptor
             return _mock;
         }
     }
-
-
-  
-     
+    
     public virtual void Verify()
     {
         if (_mock !=  null)
             _mock.Verify();
     }
-    public override string ToString()
-    {
-        return ServiceType.Name;
-    }
-}
-
-public class RealInstanceDescriptor : MockDescriptor
-{ 
-    public RealInstanceDescriptor(Type serviceType, object instance) : base(serviceType, null)
-    {
-        Instance = instance;
-    }
-    public override object Instance { get; }
-    public override Mock Mock => null;
-    public override void Verify() { }
 }
 

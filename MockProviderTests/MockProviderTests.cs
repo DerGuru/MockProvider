@@ -93,9 +93,9 @@ namespace MockProviderTests
             bool fooHasBeenCalled = false;
             var m1 = new Mock<Foo>();
             var m2 = new Mock<Bus>();
+            var m = new MockProvider(m1, m2);
             m1.Setup(f => f.TestFoo()).Callback(() => fooHasBeenCalled = true).Verifiable();
 
-            var m = new MockProvider(m1,m2);
             var foo = m.GetRequiredService<Foo>();
 
             foo.TestFoo();
@@ -106,14 +106,15 @@ namespace MockProviderTests
         [TestMethod]
         public void MocksCanBeVerified_NotCalledNotVerified()
         {
-            bool fooHasBeenCalled = false;
+
             var m1 = new Mock<Foo>();
             var m2 = new Mock<Bus>();
-            m1.Setup(f => f.TestFoo()).Callback(() => fooHasBeenCalled = true).Verifiable();
+            m1.Setup(f => f.TestFoo()).Verifiable();
 
             var m = new MockProvider(m1);
+            m.Add(m2);
             var foo = m.GetRequiredService<Foo>();
-            Assert.IsFalse(fooHasBeenCalled);
+
             try
             {
                 m.Verify();
@@ -121,8 +122,68 @@ namespace MockProviderTests
             catch (MockException e)
             {
                 Assert.IsTrue(e.IsVerificationError);
-                Assert.IsTrue(e.Message.Contains("TestFoo")); 
+                Assert.IsTrue(e.Message.Contains("TestFoo"));
             }
+        }
+
+        [TestMethod]
+        public void CreatedMocksAreAdded()
+        {
+            var m = new MockProvider();
+            m.CreateMock<Foo>();
+
+            Assert.IsNotNull(m.GetService<Foo>());
+        }
+
+        [TestMethod]
+        public void ProForma()
+        {
+            var m = new MockProvider();
+            Assert.AreEqual(2, m.Count);
+
+            m.CreateMock<Foo>();
+            Assert.AreEqual(3, m.Count);
+
+            var md = m[2] as MockDescriptor;
+            Assert.AreEqual(2, m.IndexOf(md));
+
+            var foo = m.GetService<Foo>();
+            Assert.AreSame(md.Instance, foo);
+
+            Assert.IsTrue(m.Contains(md));
+
+            Assert.IsTrue(m.Remove(md));
+            Assert.AreEqual(2, m.Count);
+            Assert.IsFalse(m.Contains(md));
+
+            var id = new InstanceDescriptor(typeof(Bar<Foo>),new Bar<Foo>(m));
+            m.Insert(2, id);
+
+            m.RemoveAt(2);
+            Assert.AreEqual(2, m.Count);
+            m[1] = id;
+            Assert.AreSame(m[1], id);
+
+            m.Clear();
+            Assert.AreEqual(2, m.Count);
+
+            m.CreateMock<Bar<Foo>>(m);
+            var target = new ServiceDescriptor[m.Count];
+            m.CopyTo(target, 0);
+
+            foreach (var mde in m)
+            {
+                int i = m.IndexOf(mde);
+                Assert.AreSame(mde, target[i]);
+            }
+
+            Assert.IsFalse(m.IsReadOnly);
+
+            m.Clear();
+
+            m.AddTransient(typeof(Bar<>));
+
+            m.CreateMock<Bar<Bus>>(m);
         }
     }
 }

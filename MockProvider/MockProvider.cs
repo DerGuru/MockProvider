@@ -11,9 +11,15 @@ public class MockProvider : IList<ServiceDescriptor>, IServiceProvider, IService
 
     public MockProvider()
     {
-        _mocks.Add(new RealInstanceDescriptor(typeof(IServiceProvider), this));
-        _mocks.Add(new RealInstanceDescriptor(typeof(IServiceCollection), this));
+        Initialize();
     }
+
+    private void Initialize()
+    {
+        _mocks.Add(new InstanceDescriptor(typeof(IServiceProvider), this));
+        _mocks.Add(new InstanceDescriptor(typeof(IServiceCollection), this));
+    }
+
     public MockProvider(IEnumerable<Mock> mocks) : this()
     {
         foreach (var mock in mocks)
@@ -103,23 +109,23 @@ public class MockProvider : IList<ServiceDescriptor>, IServiceProvider, IService
     public ServiceDescriptor this[int index]
     {
         get => _mocks[index];
-        set => _mocks[index] = new MockDescriptor(value.ServiceType, this);
+        set => _mocks[index] = value as MockDescriptor ?? new MockDescriptor(value.ServiceType, this);
     }
 
     void Add(ServiceDescriptor item)
     {
-        _mocks.Add(new MockDescriptor(item.ServiceType, this));
+        _mocks.Add(item as MockDescriptor ?? new MockDescriptor(item.ServiceType, this));
     }
 
     public int IndexOf(ServiceDescriptor item)
     {
-        var mock = _mocks.FirstOrDefault(x => x.ServiceType == item.ServiceType);
+        var mock = _mocks.FirstOrDefault(x => x.ServiceType.FullName == item.ServiceType.FullName);
         return mock == null ? -1 : _mocks.IndexOf(mock);
     }
 
     public void Insert(int index, ServiceDescriptor item)
     {
-        _mocks.Insert(index, new MockDescriptor(item.ServiceType, this));
+        _mocks.Insert(index, item as MockDescriptor ?? new MockDescriptor(item.ServiceType, this));
     }
 
     public void RemoveAt(int index)
@@ -135,9 +141,10 @@ public class MockProvider : IList<ServiceDescriptor>, IServiceProvider, IService
     public void Clear()
     {
         _mocks.Clear();
+        Initialize();
     }
 
-    public bool Contains(ServiceDescriptor item) => _mocks.Any(x => x.ServiceType == item.ServiceType);
+    public bool Contains(ServiceDescriptor item) => _mocks.Any(x => x.ServiceType.FullName == item.ServiceType.FullName);
 
 
     public void CopyTo(ServiceDescriptor[] array, int arrayIndex)
@@ -147,20 +154,13 @@ public class MockProvider : IList<ServiceDescriptor>, IServiceProvider, IService
 
     public bool Remove(ServiceDescriptor item)
     {
-        var mock = _mocks.FirstOrDefault(x => x.ServiceType == item.ServiceType);
+        var mock = _mocks.FirstOrDefault(x => x.ServiceType.FullName == item.ServiceType.FullName);
         return (mock != null)
             ? _mocks.Remove(mock)
             : false;
     }
 
-    public IEnumerator<ServiceDescriptor> GetEnumerator()
-    {
-        return _mocks.GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return _mocks.GetEnumerator();
-    }
+    public IEnumerator<ServiceDescriptor> GetEnumerator() => _mocks.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     #endregion
 }
