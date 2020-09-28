@@ -74,7 +74,7 @@ Using the `IServiceCollection`s internal type, there are three ways to go:
   1.  There is a `MockDescriptor` derived from `ServiceDescriptor`, which allows you to first create your Mock and then add it to the IoC-Container. The `MockDescriptor`-Instance is added to the Container, as it is. 
   2.  There is also a `InstanceDescriptor`, which will add a real object to the Container, allowing you to implement your own stub and use it in the IoC-Container. The `InstanceDescriptor`-Instance is added to the Container, as it is, since it derives from MockDescriptor.
 
-##FAQ
+## FAQ
 ### When registering the same service type multiple time, which one will be returned on `GetService<T>()`?
 ```csharp
     var fooMock1 = new Mock<IFoo>();
