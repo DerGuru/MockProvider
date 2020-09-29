@@ -6,7 +6,7 @@ using System;
 namespace MockProviderTests
 {
     [TestClass]
-    public class MockTests
+    public class Tests
     {
 
         [TestMethod]

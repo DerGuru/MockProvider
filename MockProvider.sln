@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockProvider", "MockProvide
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockProviderTests", "MockProviderTests\MockProviderTests.csproj", "{123FA7D4-92B9-437E-81ED-AD3ADC48A0FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StartUpTests", "StartUpTests\StartUpTests.csproj", "{F10DAE0E-1125-4738-99F7-9585715BF52C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{123FA7D4-92B9-437E-81ED-AD3ADC48A0FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{123FA7D4-92B9-437E-81ED-AD3ADC48A0FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{123FA7D4-92B9-437E-81ED-AD3ADC48A0FB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F10DAE0E-1125-4738-99F7-9585715BF52C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F10DAE0E-1125-4738-99F7-9585715BF52C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F10DAE0E-1125-4738-99F7-9585715BF52C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F10DAE0E-1125-4738-99F7-9585715BF52C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
