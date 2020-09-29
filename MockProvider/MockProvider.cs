@@ -43,6 +43,17 @@ public class MockProvider : IList<ServiceDescriptor>, IServiceProvider, IService
     }
     #endregion
 
+    public Mock<T> GetMock<T>() where T : class => GetMock(typeof(T)) as Mock<T>;
+    
+    public Mock GetMock(Type serviceType)
+    {
+        var retVal = _mocks.FirstOrDefault(x => x.ServiceType.FullName == serviceType.FullName);
+        if (retVal == null && _mocks.Any(x => x.ServiceType.Name == serviceType.Name))
+        {
+            return CreateMock(serviceType).Mock;
+        }
+        return retVal?.Mock;
+    }
     public void Add<T>(Mock<T> mock) where T : class
     {
         Add(typeof(T), mock);
