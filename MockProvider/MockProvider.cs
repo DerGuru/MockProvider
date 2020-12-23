@@ -8,7 +8,7 @@ using System.Linq;
 public class MockProvider : IList<ServiceDescriptor>, IServiceProvider, IServiceCollection
 {
     private List<MockDescriptor> _mocks = new List<MockDescriptor>();
-
+    private static readonly Type _ienumerableType = typeof(IEnumerable<>);
     public MockProvider()
     {
         Initialize();
@@ -34,17 +34,38 @@ public class MockProvider : IList<ServiceDescriptor>, IServiceProvider, IService
     #region IServiceProvider
     public object GetService(Type serviceType)
     {
+        //find direct type
         var retVal = _mocks.FirstOrDefault(x => x.ServiceType.FullName == serviceType.FullName);
-        if (retVal == null && _mocks.Any(x => x.ServiceType.Name == serviceType.Name))
+        if (retVal != null) 
+            return retVal.Instance;
+
+        if (_mocks.Any(x => x.ServiceType.Name == serviceType.Name))
         {
             return CreateMock(serviceType).Instance;
         }
+        
+        if (serviceType.Name == _ienumerableType.Name && serviceType.IsGenericType)
+        {
+            var type = serviceType.GetGenericArguments().FirstOrDefault();
+            if (type != null)
+            {
+                var arr = _mocks.Where(x => x.ServiceType.FullName == type.FullName).Select(x => x.Instance).ToArray();
+                var array = Array.CreateInstance(type, arr.Length);
+                for(int i = 0; i< arr.Length; ++i)
+                {
+                    array.SetValue(arr[i],i);
+                }
+
+                return array;
+            }
+        }
+        
         return retVal?.Instance;
     }
     #endregion
 
     public Mock<T> GetMock<T>() where T : class => GetMock(typeof(T)) as Mock<T>;
-    
+
     public Mock GetMock(Type serviceType)
     {
         var retVal = _mocks.FirstOrDefault(x => x.ServiceType.FullName == serviceType.FullName);
@@ -54,6 +75,7 @@ public class MockProvider : IList<ServiceDescriptor>, IServiceProvider, IService
         }
         return retVal?.Mock;
     }
+
     public void Add<T>(Mock<T> mock) where T : class
     {
         Add(typeof(T), mock);
@@ -61,12 +83,8 @@ public class MockProvider : IList<ServiceDescriptor>, IServiceProvider, IService
 
     public MockDescriptor Add(Type t, Mock mock)
     {
-        var e = _mocks.FirstOrDefault(x => x.ServiceType.FullName == t.FullName);
-        if (e == null)
-        {
-            e = new MockDescriptor(t, mock, this);
-            _mocks.Add(e);
-        }
+        var e = new MockDescriptor(t, mock, this);
+        _mocks.Add(e);
         return e;
     }
 
@@ -95,7 +113,7 @@ public class MockProvider : IList<ServiceDescriptor>, IServiceProvider, IService
 
     public object[] GetConstructorParameters(Type t)
     {
-        var c = t.GetConstructors().FirstOrDefault(x => !x.GetParameters().Any() || x.GetParameters().All(y => _mocks.Any(x => x.ServiceType.Name == y.ParameterType.Name)));
+        var c = t.GetConstructors().FirstOrDefault(x => !x.GetParameters().Any() || x.GetParameters().All(y => _mocks.Any(xz => xz.ServiceType.Name == y.ParameterType.Name)));
         if (c != null && c.GetParameters().Any())
         {
             var parameters = c.GetParameters();

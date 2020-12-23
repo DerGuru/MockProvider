@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
+using System.Linq;
 
 namespace MockProviderTests
 {
@@ -184,6 +185,16 @@ namespace MockProviderTests
             m.AddTransient(typeof(Bar<>));
 
             m.CreateMock<Bar<Bus>>(m);
+        }
+
+        [TestMethod]
+        public void GetServices()
+        {
+            var m = new MockProvider();
+            m.CreateMock<Foo>();
+            m.CreateMock<Foo>();
+            var mocks = m.GetServices<Foo>();
+            Assert.AreEqual(2, mocks.Count());
         }
     }
 }

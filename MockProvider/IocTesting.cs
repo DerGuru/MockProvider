@@ -43,7 +43,7 @@ public static class IocTesting
 
             foreach (var m in t.GetMethods())
             {
-                var parameters = m.GetParameters().Where(x => x.GetCustomAttributes().Any(x => x.GetType().FullName == "Microsoft.AspNetCore.Mvc.FromServicesAttribute"));
+                var parameters = m.GetParameters().Where(x => x.GetCustomAttributes().Any(xz => xz.GetType().FullName == "Microsoft.AspNetCore.Mvc.FromServicesAttribute"));
                 foreach (var p in parameters)
                 {
                     if (mocks.GetService(p.ParameterType) == null)
