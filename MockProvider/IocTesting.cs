@@ -6,12 +6,6 @@ using System.Reflection;
 
 public static class IocTesting
 {
-    private static List<Type> FromInterface(Assembly asm, Type tBase)
-           => asm.GetTypes().Where(x => x.GetInterfaces().Contains(tBase)).ToList();
-
-    private static List<Type> FromClass(Assembly asm, Type tBase)
-        => asm.GetTypes().Where(x => x.IsSubclassOf(tBase)).ToList();
-    
     /// <summary>
     /// 
     /// </summary>
@@ -26,7 +20,7 @@ public static class IocTesting
         var tBase = typeof(TBase);
 
         asm = asm ?? configureServices.Method.DeclaringType.Assembly;
-        List<Type> types = tBase.IsInterface ? FromInterface(asm, tBase) : FromClass(asm, tBase);
+        List<Type> types = asm.GetTypes().Where(x => tBase.IsAssignableFrom(x)).ToList();
 
         configureServices(mocks);
         foreach (var t in types)
