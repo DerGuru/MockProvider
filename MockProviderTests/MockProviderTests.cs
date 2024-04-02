@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
+using NSubstitute;
 using System;
 using System.Linq;
 
@@ -81,8 +81,8 @@ namespace MockProviderTests
         [TestMethod]
         public void MocksCanBeAddedInContructorOfMockProvider()
         {
-            var m1 = new Mock<Foo>();
-            var m2 = new Mock<Bus>();
+            var m1 = Substitute.For<Foo>();
+            var m2 = Substitute.For<Bus>();
             var m = new MockProvider(m1, m2);
 
             var o = m.GetRequiredService<Bus>();
@@ -91,41 +91,18 @@ namespace MockProviderTests
         [TestMethod]
         public void MocksCanBeVerified_CalledIsVerified()
         {
-            bool fooHasBeenCalled = false;
-            var m1 = new Mock<Foo>();
-            var m2 = new Mock<Bus>();
+           
+            var m1 = Substitute.For<Foo>();
+            var m2 = Substitute.For<Bus>();
             var m = new MockProvider(m1, m2);
-            m1.Setup(f => f.TestFoo()).Callback(() => fooHasBeenCalled = true).Verifiable();
 
             var foo = m.GetRequiredService<Foo>();
 
             foo.TestFoo();
-            Assert.IsTrue(fooHasBeenCalled);
-            m.Verify();
+            m1.Received(1).TestFoo();
+            m2.DidNotReceive().TestBus();
         }
 
-        [TestMethod]
-        public void MocksCanBeVerified_NotCalledNotVerified()
-        {
-
-            var m1 = new Mock<Foo>();
-            var m2 = new Mock<Bus>();
-            m1.Setup(f => f.TestFoo()).Verifiable();
-
-            var m = new MockProvider(m1);
-            m.Add(m2);
-            var foo = m.GetRequiredService<Foo>();
-
-            try
-            {
-                m.Verify();
-            }
-            catch (MockException e)
-            {
-                Assert.IsTrue(e.IsVerificationError);
-                Assert.IsTrue(e.Message.Contains("TestFoo"));
-            }
-        }
 
         [TestMethod]
         public void CreatedMocksAreAdded()
@@ -145,11 +122,11 @@ namespace MockProviderTests
             m.CreateMock<Foo>();
             Assert.AreEqual(3, m.Count);
 
-            var md = m[2] as MockDescriptor;
+            var md = m[2];
             Assert.AreEqual(2, m.IndexOf(md));
 
             var foo = m.GetService<Foo>();
-            Assert.AreSame(md.Instance, foo);
+            Assert.AreSame(md.ImplementationInstance, foo);
 
             Assert.IsTrue(m.Contains(md));
 
@@ -157,7 +134,7 @@ namespace MockProviderTests
             Assert.AreEqual(2, m.Count);
             Assert.IsFalse(m.Contains(md));
 
-            var id = new InstanceDescriptor(typeof(Bar<Foo>),new Bar<Foo>(m));
+            var id = new InstanceDescriptor<Bar<Foo>>(new Bar<Foo>(m));
             m.Insert(2, id);
 
             m.RemoveAt(2);

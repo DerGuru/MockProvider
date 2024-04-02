@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+	  <TargetFramework>net8.0</TargetFramework>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Authors>Andreas Jakof</Authors>
     <Description>Provides Mocks in IServiceCollection and IServiceProvider</Description>
@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.8" />
-    <PackageReference Include="Moq" Version="4.14.5" />
+    <PackageReference Include="NSubstitute" Version="5.1.0" />
   </ItemGroup>
 
 </Project>

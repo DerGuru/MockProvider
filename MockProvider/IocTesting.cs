@@ -20,7 +20,7 @@ public static class IocTesting
         var tBase = typeof(TBase);
 
         asm = asm ?? configureServices.Method.DeclaringType.Assembly;
-        List<Type> types = asm.GetTypes().Where(x => tBase.IsAssignableFrom(x)).ToList();
+        List<Type> types = asm.GetTypes().Where(tBase.IsAssignableFrom).ToList();
 
         configureServices(mocks);
         foreach (var t in types)

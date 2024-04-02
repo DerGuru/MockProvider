@@ -17,11 +17,10 @@ namespace Ioc
         }
 
         [TestMethod]
-        [Ignore] //this test is supposed to fail, to show how to put the data 
         public void NotAddedTypeIsNotAvailable()
         {
             var missings = IocTesting.FindMissingRegistrations<IMarker>(IocTest.ConfigureBadCase);
-            Assert.IsFalse(missings.Any(), missings.First().ToString());
+            Assert.IsTrue(missings.Any(), missings.First().ToString());
         }
 
     }

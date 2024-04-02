@@ -1,14 +1,9 @@
-﻿using Moq;
-using System;
+﻿using Microsoft.Extensions.DependencyInjection;
 
-public class InstanceDescriptor : MockDescriptor
+public class InstanceDescriptor<T> : MockDescriptor where T : class
 { 
-    public InstanceDescriptor(Type serviceType, object instance) : base(serviceType, null)
+    public InstanceDescriptor(T instance) : base(typeof(T), instance)
     {
-        Instance = instance;
     }
-    public override object Instance { get; }
-    public override Mock Mock { get; } = null;
-    public override void Verify() { }
 }
 

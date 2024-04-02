@@ -1,53 +1,51 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Moq;
+using NSubstitute;
 using System;
-using System.Linq;
-using System.Threading;
 
 public class MockDescriptor : ServiceDescriptor
 {
-    protected MockProvider _mockProvider;
-    private Mock _mock = null;
-
-    
-
-    private Mock CreateMock()
+    public static object CreateMock(Type t, IServiceProvider sp)
+       => Substitute.For(new Type[] { t},(sp as MockProvider).GetConstructorParameters(t));
+   
+    public MockDescriptor(ServiceDescriptor sd) : this(sd.ServiceType,sd.Lifetime)
     {
-        var mockType = typeof(Mock<>);
-
-        mockType = mockType.MakeGenericType(ServiceType);
-        return Activator.CreateInstance(mockType, _mockProvider.GetConstructorParameters(ServiceType)) as Mock;
+    }
+    public MockDescriptor(Type serviceType, object instance) : base(serviceType, instance)
+    {
+    }
+    public MockDescriptor(Type serviceType, ServiceLifetime lifetime) : base(serviceType, (sp) => CreateMock(serviceType,sp), lifetime)
+    {
+    }
+    public MockDescriptor(Type serviceType, Func<IServiceProvider, object> factory, ServiceLifetime lifetime) : base(serviceType, factory, lifetime)
+    {
     }
     
-    public MockDescriptor(Type serviceType, MockProvider provider) : base (serviceType, serviceType, ServiceLifetime.Transient)
+}
+
+public class MockDescriptor<T> : MockDescriptor where T : class
+{
+    private static T CreateMockP(IServiceProvider sp) => MockDescriptor.CreateMock(typeof(T), sp) as T;
+       
+    public MockDescriptor() : base (typeof(T), CreateMockP,  ServiceLifetime.Transient)
     {
-        _mockProvider = provider;
+        
+    }
+    public MockDescriptor(Func<IServiceProvider,T> factory,ServiceLifetime serviceLifetime) : base(typeof(T), factory, serviceLifetime)
+    {
+
     }
 
-    public MockDescriptor(Type serviceType, Mock instance, MockProvider provider) : base(serviceType, serviceType, ServiceLifetime.Transient)
-    {
-        _mockProvider = provider;
-        _mock = instance;
-    }
-
-    public virtual object Instance => Mock.Object;
-
-    public virtual Mock Mock
-    {
-        get
-        {
-            if (_mock == null)
-            {
-                Interlocked.CompareExchange<Mock>(ref _mock, CreateMock(), null);
-            }
-            return _mock;
-        }
-    }
-    
-    public virtual void Verify()
-    {
-        if (_mock !=  null)
-            _mock.Verify();
+    public MockDescriptor(T instance) : base(typeof(T),instance)
+    { 
+        
     }
 }
 
+public class MockDescriptor<T,U> : MockDescriptor<T> where U : class, T where T :  class
+{
+    private static T CreateMock(IServiceProvider sp) => MockDescriptor.CreateMock(typeof(U), sp) as T;
+        
+
+    public MockDescriptor() : base( CreateMock, ServiceLifetime.Transient)
+    {}
+}
