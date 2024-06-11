@@ -88,6 +88,28 @@ public class MockProvider : IList<ServiceDescriptor>, IServiceProvider, IService
         return e;
     }
 
+    public MockDescriptor Add(MockDescriptor md)
+    {
+        _mocks.Add(md);
+        return md;
+    }
+
+    public MockDescriptor Add(InstanceDescriptor id)
+    {
+        _mocks.Add(id);
+        return id;
+    }
+
+    public void Add(ServiceDescriptor item)
+    {
+        _ = item switch
+        {
+            MockDescriptor md => Add(md),
+            ServiceDescriptor sd when sd.ImplementationInstance != null => Add(new InstanceDescriptor(sd.ServiceType, sd.ImplementationInstance)),
+            _ => Add(new MockDescriptor(item.ServiceType, this))
+        };
+    }
+
     public Mock<U> CreateMock<U>(params object[] o) where U : class
     {
         return CreateMock(typeof(U), o).Mock as Mock<U>;
@@ -141,10 +163,7 @@ public class MockProvider : IList<ServiceDescriptor>, IServiceProvider, IService
         set => _mocks[index] = value as MockDescriptor ?? new MockDescriptor(value.ServiceType, this);
     }
 
-    public void Add(ServiceDescriptor item)
-    {
-        _mocks.Add(item as MockDescriptor ?? new MockDescriptor(item.ServiceType, this));
-    }
+    
 
     public int IndexOf(ServiceDescriptor item)
     {

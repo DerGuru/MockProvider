@@ -12,7 +12,8 @@ namespace Ioc
         [TestMethod]
         public void AddedTypeIsAvailable()
         {
-            var missings = IocTesting.FindMissingRegistrations<IMarker>(IocTest.ConfigureGoodCase);
+            var asm = typeof(Tests).Assembly;
+            var missings = asm.FindMissingRegistrations<IMarker>(IocTest.ConfigureGoodCase<Foo>);
             Assert.IsFalse(missings.Any());
         }
 
@@ -20,7 +21,8 @@ namespace Ioc
         [Ignore] //this test is supposed to fail, to show how to put the data 
         public void NotAddedTypeIsNotAvailable()
         {
-            var missings = IocTesting.FindMissingRegistrations<IMarker>(IocTest.ConfigureBadCase);
+            var asm = typeof(Tests).Assembly;
+            var missings = asm.FindMissingRegistrations<IMarker>(IocTest.ConfigureBadCase);
             Assert.IsFalse(missings.Any(), missings.First().ToString());
         }
 
@@ -29,10 +31,11 @@ namespace Ioc
     public class IocTest : IMarker
     {
         public IocTest(Foo foo) { }
+        public IocTest(Bar bar) { }
 
-        public static void ConfigureGoodCase(IServiceCollection s)
+        public static void ConfigureGoodCase<T>(IServiceCollection s) where T : class
         {
-            s.AddTransient<Foo>();
+            s.AddTransient<T>();
         }
 
         public static void ConfigureBadCase(IServiceCollection s)

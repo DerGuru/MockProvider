@@ -8,4 +8,11 @@ namespace MockProviderTests
         {
         }
     }
+
+    public class Bar
+    {
+        public Bar(IServiceProvider sp)
+        {
+        }
+    }
 }
