@@ -13,7 +13,23 @@ namespace Ioc
         public void AddedTypeIsAvailable()
         {
             var asm = typeof(Tests).Assembly;
+            var missings = asm.FindMissingRegistrations<IMarker>(IocTest.ConfigureGoodCaseAll);
+            Assert.IsFalse(missings.Any());
+        }
+
+        [TestMethod]
+        public void AddedTypeIsAvailableFoo()
+        {
+            var asm = typeof(Tests).Assembly;
             var missings = asm.FindMissingRegistrations<IMarker>(IocTest.ConfigureGoodCase<Foo>);
+            Assert.IsFalse(missings.Any());
+        }
+
+        [TestMethod]
+        public void AddedTypeIsAvailableBar()
+        {
+            var asm = typeof(Tests).Assembly;
+            var missings = asm.FindMissingRegistrations<IMarker>(IocTest.ConfigureGoodCase<Bar>);
             Assert.IsFalse(missings.Any());
         }
 
@@ -36,6 +52,12 @@ namespace Ioc
         public static void ConfigureGoodCase<T>(IServiceCollection s) where T : class
         {
             s.AddTransient<T>();
+        }
+
+        public static void ConfigureGoodCaseAll(IServiceCollection s)
+        {
+            s.AddTransient<Foo>();
+            s.AddTransient<Bar>();
         }
 
         public static void ConfigureBadCase(IServiceCollection s)
